@@ -5,8 +5,8 @@ const userSchema = new mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    address: { type: String, required : true },
-    pin: { type: String, required: true, minlength: 4, maxlength: 4 }
+    address: { type: String, default: '' },
+    pin: { type: String, minlength: 4, maxlength: 4, default: '' }
 });
 
 const UserAuth = mongoose.model("User", userSchema);
