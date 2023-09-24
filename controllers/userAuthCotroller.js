@@ -70,6 +70,10 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        // Compare the plain text password with the one in the database
+        if (password !== user.password) {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
 
         const token = jwt.sign({ userId: user._id }, "Affaqkhan211", { expiresIn: '3h' });
 
@@ -79,6 +83,7 @@ export const login = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 export const addAddress = async (req, res) => {
