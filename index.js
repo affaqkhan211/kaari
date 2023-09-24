@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Connection from "./db/conn.js";
 import userAuthRouter from "./routes/userAuthRoutes.js";
 import cors from "cors";
+import addressRoute from "./routes/addressRoute.js";
 
 dotenv.config()
 const PORT = process.env.PORT ;
@@ -22,6 +23,7 @@ app.use(express.json())
 
 // routes
 app.use("/api/v1/user", userAuthRouter);
+app.use("/api/v1/user/address", addressRoute);
 
 
 
