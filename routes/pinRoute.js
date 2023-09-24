@@ -5,6 +5,6 @@ import isAuthenticated from "../middlewares/auth.js";
 
 
 pinRouter.post('/add-pin', isAuthenticated,  setPin);
-pinRouter.post("/verify-pin", isAuthenticated ,verifyPin)
+// pinRouter.post("/verify-pin", isAuthenticated ,verifyPin)
 
 export default pinRouter;

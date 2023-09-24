@@ -1,8 +1,8 @@
 import express from "express";
 import isAuthenticated from "../middlewares/auth.js";
 import { verifyPin } from "../controllers/userAuthCotroller.js";
-const verfifyPinRouter = express.Router();
+const verifyPinRouter = express.Router();
 
-verfifyPinRouter.post("/verify-pin", isAuthenticated, verifyPin);
+verifyPinRouter.post("/verify-pin", isAuthenticated, verifyPin);
 
-export default verfifyPinRouter;
+export default verifyPinRouter;

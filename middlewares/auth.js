@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken"
 
 const isAuthenticated = (req, res, next) => {
-  console.log("Verify is here");
   const authorizationHeader = req.headers.authorization;
 
   if (!authorizationHeader) {
