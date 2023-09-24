@@ -7,6 +7,7 @@ import cors from "cors";
 import addressRoute from "./routes/addressRoute.js";
 import pinRouter from "./routes/pinRoute.js";
 import verifyPinRouter from "./routes/verifyPinRoute.js";
+import foodRouter from "./routes/foodRoutes.js";
 
 dotenv.config()
 const PORT = process.env.PORT ;
@@ -23,11 +24,13 @@ app.use((req, res, next) => {
 Connection()
 app.use(express.json())
 
+
 // routes
 app.use("/api/v1/user", userAuthRouter);
 app.use("/api/v1/user/address", addressRoute);
 app.use("/api/v1/user/pin", pinRouter)
 app.use("/api/v1/user/pin", verifyPinRouter)
+app.use("/api/v1/food", foodRouter)
 
 
 
