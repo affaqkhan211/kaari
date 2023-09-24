@@ -5,6 +5,8 @@ import Connection from "./db/conn.js";
 import userAuthRouter from "./routes/userAuthRoutes.js";
 import cors from "cors";
 import addressRoute from "./routes/addressRoute.js";
+import pinRouter from "./routes/pinRoute.js";
+import verfifyPinRouter from "./routes/verifyPinRoute.js";
 
 dotenv.config()
 const PORT = process.env.PORT ;
@@ -24,6 +26,8 @@ app.use(express.json())
 // routes
 app.use("/api/v1/user", userAuthRouter);
 app.use("/api/v1/user/address", addressRoute);
+app.use("/api/v1/user/pin", pinRouter)
+app.use("/api/v1/user/pin", verfifyPinRouter)
 
 
 

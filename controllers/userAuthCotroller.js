@@ -1,7 +1,6 @@
-import { UserAuth, Address } from "../models/userAuthModel.js";
+import { UserAuth, Address, Pin } from "../models/userAuthModel.js";
 // import twilio from "twilio"
 import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt"
 
 export const userSignup = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
@@ -69,10 +68,10 @@ export const login = async (req, res) => {
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid email or password' });
-          }
+        }
 
 
-        const token = jwt.sign({ userId: user._id }, process.env.LOGIN_SECRET_KEY, { expiresIn: '3h' });
+        const token = jwt.sign({ userId: user._id }, "Affaqkhan211", { expiresIn: '3h' });
 
         res.json({ token });
     } catch (error) {
@@ -93,6 +92,11 @@ export const addAddress = async (req, res) => {
         const newAddress = new Address({ address });
         await newAddress.save();
 
+        // Associate the address with the logged-in user
+        const user = await UserAuth.findById(req.userId);
+        user.address = newAddress._id;
+        await user.save();
+
         res.status(201).json({ message: 'Address added successfully', address: newAddress });
     } catch (error) {
         console.error(error);
@@ -101,43 +105,72 @@ export const addAddress = async (req, res) => {
 };
 
 export const setPin = async (req, res) => {
-    const { userId } = req.params;
     const { pin } = req.body;
+    const userId = req.userId; // Get userId from req object
 
     try {
-        const user = await UserAuth.findByIdAndUpdate(
-            userId,
-            { $set: { pin } },
-            { new: true }
-        );
+        if (!pin) {
+            return res.status(400).json({ message: 'Pin is required' });
+        }
 
-        res.json({ user, message: 'PIN set successfully!' });
-    } catch (error) {
-        res.status(400).json({ message: 'Error setting PIN', error: error.message });
-    }
-};
+        const parsedPin = parseInt(pin, 10);
+        if (isNaN(parsedPin) || parsedPin < 1000 || parsedPin > 9999) {
+            return res.status(400).json({ message: 'Pin must be a 4-digit number' });
+        }
 
-export const verifyPin = async (req, res) => {
-    const { userId } = req.params;
-    const { pin } = req.body;
+        const newPin = new Pin({ pin: parsedPin });
+        await newPin.save();
 
-    try {
         const user = await UserAuth.findById(userId);
-
+        console.log(user);
+        console.log(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (user.pin === pin) {
-            return res.json({ message: 'PIN verified successfully. Access granted!' });
-        } else {
-            return res.status(401).json({ message: 'Incorrect PIN. Access denied' });
-        }
+        user.pin = newPin._id;
+        await user.save();
+
+        res.status(201).json({ message: 'Pin added successfully', pin: newPin });
     } catch (error) {
-        res.status(400).json({ message: 'Error verifying PIN', error: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
-
-
-
+export const verifyPin = async (req, res) => {
+    const { pin } = req.body;
+    const userId = req.userId;
+  
+    try {
+      if (!pin) {
+        return res.status(400).json({ message: 'Pin is required' });
+      }
+  
+      const parsedPin = parseInt(pin, 10);
+      if (isNaN(parsedPin) || parsedPin < 1000 || parsedPin > 9999) {
+        return res.status(400).json({ message: 'Pin must be a 4-digit number' });
+      }
+  
+      const user = await UserAuth.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const userPin = await Pin.findById(user.pin);
+  
+      if (!userPin) {
+        return res.status(404).json({ message: 'Pin not found for the user' });
+      }
+  
+      if (userPin.pin !== parsedPin) {
+        return res.status(401).json({ message: 'Incorrect pin' });
+      }
+  
+      res.status(200).json({ message: 'Pin verified successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+  
